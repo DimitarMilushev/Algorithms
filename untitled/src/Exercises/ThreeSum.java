@@ -1,5 +1,8 @@
 package Algorithms.Exercises.src;
 
+import jdk.jshell.spi.ExecutionControl;
+
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -37,10 +40,16 @@ import java.util.*;
  *     -105 <= nums[i] <= 105
  */
 class ThreeSum {
+    private static void printSolution(String name, String result, String complexity) {
+        System.out.println(MessageFormat.format(
+                "3Sum [{0}]\n    Result: {1}\n    TimeComplexity: {2}\n===================================",
+                name, result, complexity));
+    }
      public static void main(String[] args) {
-         int[] list = new int[] {-1,0,1,2,-1,-4};
-         System.out.println(threeSum(list));
-
+         int[] list = new int[] {-1,0,1,2,-1,-4,-2,-3,3,0,4};
+         printSolution("Two Pointer", threeSumTwoPointer(list).toString(), "O(n^2)");
+         printSolution("Heuristic Approach", threeSumHeuristic(list).toString(), "O(n^3)");
+         printSolution("HashMap Approach", threeSumHashMap(list).toString(), "O(n^2)");
          /**
           * Small test that concludes java passes myList by reference!
           * Try using .put with by passing myList and then myList.stream().toList()
@@ -56,33 +65,34 @@ class ThreeSum {
 //        m.put("345", myList);
 //        System.out.println(m.toString());
     }
-    // Optimization - add all values in a hashmap
-    // Then Check if the diff of the other 2 numbers is equal to it - if TRUE, then add pair
-    public static List<List<Integer>> threeSum(int[] nums) {
-        ArrayList<Integer> triplets = new ArrayList<Integer>(Collections.nCopies(3, 0));
-        HashMap<String, List<Integer>> mappings = new HashMap();
-        // O(n)
-        // Add all numbers as unique keys
-        for (int i = 0; i< nums.length; i++) {
-//            mappings.put() // TODO: FInish
-        }
-        for (int i = 0; i < nums.length - 2; i++) {
-            triplets.set(0, nums[i]);
-            for (int j = i + 1; j < nums.length - 1; j++) {
-                triplets.set(1, nums[j]);
-                for (int z = j + 1; z < nums.length; z++) {
-                    triplets.set(2, nums[z]);
-                    if (triplets.stream().reduce(0, Integer::sum) == 0) {
-                        mappings.putIfAbsent(generateHashID(triplets), triplets.stream().toList());
-                    }
-                }
-            }
-        }
-        return new ArrayList(mappings.values().stream().toList());
-    }
+
+    /**
+     * Heuristic approach. (Bad runtime speed)
+     * Time complexity: O(n^3)
+     */
+   public static List<List<Integer>> threeSumHeuristic(int[] nums) {
+       if (nums.length < 3) {
+           return new ArrayList();
+       }
+       ArrayList<Integer> triplets = new ArrayList<Integer>(Collections.nCopies(3, 0));
+       HashMap<String, List<Integer>> mappings = new HashMap();
+       for (int i = 0; i < nums.length - 2; i++) {
+           triplets.set(0, nums[i]);
+           for (int j = i + 1; j < nums.length - 1; j++) {
+               triplets.set(1, nums[j]);
+               for (int z = j + 1; z < nums.length; z++) {
+                   triplets.set(2, nums[z]);
+                   if (triplets.stream().reduce(0, Integer::sum) == 0) {
+                       mappings.putIfAbsent(generateHashID(triplets), triplets.stream().toList());
+                   }
+               }
+           }
+       }
+       return new ArrayList<>(mappings.values().stream().toList());
+   }
     // Apply selection sort on triplets (complexity is negligible) - Search smallest
     private static String generateHashID(List<Integer> input) {
-        Integer[] triplets = input.toArray(new Integer[input.size()]);
+        Integer[] triplets = input.toArray(new Integer[0]);
         int tempIndex;
         int tempValue;
         for (int i = 0; i < triplets.length; i++) {
@@ -102,5 +112,96 @@ class ThreeSum {
         StringBuilder sb = new StringBuilder();
         Arrays.stream(triplets).forEach(sb::append);
         return sb.toString();
+    }
+    /**
+     * Two pointer method.
+     *
+     * Find by checking the diff of numbers in two pointers and subtracting it with the third number.
+     * sum of ptr1, ptr2 and nums[i] equals 0, add to result and move pointers
+     * if sum is lower than third num, increment ptr1
+     * else decrement ptr2
+     */
+    public static List<List<Integer>> threeSumTwoPointer(int[] nums) {
+       // Sort arr
+        Arrays.sort(nums);
+        // Outputs storage
+        Set<List<Integer>> output = new HashSet();
+        // Create pointers
+        int high, low;
+        // Other variables
+        int sum, temp1, temp2, temp3;
+        int i = 0;
+        while (i < nums.length) {
+            // set low boundary
+            low = i + 1;
+            high = nums.length - 1;
+            while (low < high) {
+                sum = nums[i] + nums[low] + nums[high];
+                if (sum > 0) {
+                    --high;
+                } else if (sum < 0) {
+                    ++low;
+                } else {
+                    output.add(List.of(nums[i], nums[low], nums[high]));
+                    // Move both because there cannot be another x = low + high* or low* + high.
+                    // To ensure we iterate the first time, we create temp1, temp2 to store current indices.
+                    temp1 = low;
+                    temp2 = high;
+                    while (low < high && nums[temp1] == nums[low]) low++;
+                    while (low < high && nums[temp2] == nums[high]) high--;
+                }
+            }
+            temp3 = i;
+            while (i < nums.length && nums[temp3] == nums[i]) i++;
+        }
+        return output.stream().toList();
+    }
+
+    /**
+     * Hashmap approach.
+     * 1. Sorts the input O(n * logn)
+     * 2. Creates a hashmap. Uses the nums value for hash and the index for value. This way the last index is of the value
+     * is preserved. O(n)
+     * Then for each element in nums checks if the result of n[i] - n[j] is equal to any of the keys in the hashmap.
+     * if YES then saves to result O(n^2)
+     * Result: O(n^2) + O(n) + O(n ln) which is technically better than O(n^3)
+     * Sometimes checks if num[j] == num[j - 1] to avoid duplicates.
+     * @param nums
+     * @return List of triplets where the sum is equal to 0
+     */
+    public static List<List<Integer>> threeSumHashMap(int[] nums) {
+        if (nums.length < 3) {
+            return new ArrayList<>();
+        }
+        // O (n * ln)
+        Arrays.sort(nums);
+        if (nums[0] > 0) {
+            return new ArrayList<>();
+        }
+        HashMap<Integer, Integer> mappings = new HashMap();
+        ArrayList<List<Integer>> result = new ArrayList<>();
+        // O(n)
+        // Add all numbers as unique keys
+        for (int i = 0; i< nums.length; i++) {
+            mappings.put(nums[i], i);
+        }
+        int key;
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (nums[i] > 0) break;
+            if (i != 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            for (int j = i + 1; j < nums.length - 1; j++) {
+                if (j != (i + 1) && nums[j] == nums[j - 1]) {
+                    continue;
+                }
+                key = -1 * (nums[i] + nums[j]);
+                if (mappings.containsKey(key) && mappings.get(key) > j) {
+                    result.add(List.of(key, nums[i], nums[j]));
+                }
+            }
+        }
+        return result.stream().toList();
     }
 }
