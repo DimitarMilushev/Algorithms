@@ -1,7 +1,7 @@
 package Algorithms.SelectionSort.test;
 
-import Algorithms.SelectionSort.src.SelectionSortValue;
-import Algorithms.SelectionSort.src.SelectionSortValueFactory;
+import Algorithms.SelectionSort.src.SMValue;
+import Algorithms.SelectionSort.src.SMValueFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,9 +17,9 @@ public class StableSelectionSortTest {
     @Test
     public void selectionSortIsStable() {
         list = new int[] {4, 1, 2, 4, 3};
-        SelectionSortValue[] values = SelectionSortValueFactory.getValueFromIntArray(list);
-        SelectionSortValue first = null;
-        SelectionSortValue second = null;
+        SMValue[] values = SMValueFactory.getValueFromIntArray(list);
+        SMValue first = null;
+        SMValue second = null;
         for (int i = 0; i < values.length; i++) {
             if (values[i].Value() == 4) {
                 if (first == null) {
@@ -34,7 +34,7 @@ public class StableSelectionSortTest {
         Assert.assertEquals(first.tag(), "a");
         Assert.assertEquals(second.tag(), "b");
 
-        SelectionSortValue[] sorted = selectionSort(values);
+        SMValue[] sorted = selectionSort(values);
         first = null;
         second = null;
         for (int i = 0; i < sorted.length; i++) {

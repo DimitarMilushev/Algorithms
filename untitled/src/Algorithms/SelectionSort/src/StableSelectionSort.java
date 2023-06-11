@@ -16,10 +16,10 @@ import java.util.Arrays;
 public class StableSelectionSort {
     public static void main(String[] args) {
         int[] list = new int[] {4, 1, 2, 4, 3};
-        SelectionSortValue[] values = SelectionSortValueFactory.getValueFromIntArray(list);
+        SMValue[] values = SMValueFactory.getValueFromIntArray(list);
         System.out.println(Arrays.toString(selectionSort(values)));
     }
-    public static SelectionSortValue[] selectionSort(SelectionSortValue[] arr) {
+    public static SMValue[] selectionSort(SMValue[] arr) {
         int tempIndex; // holds the value for each indexLowest call;
         for (int i = 0; i < arr.length; i++) {
             tempIndex = indexLowest(arr, i);
@@ -37,9 +37,9 @@ public class StableSelectionSort {
      * @param to End of shifting of sub-array
      * @param start Start of shifting of sub-array
      */
-    public static SelectionSortValue[] shiftElements(SelectionSortValue[] arr, int start,  int to) {
-        SelectionSortValue lastElement = arr[to];
-        SelectionSortValue temp;
+    public static SMValue[] shiftElements(SMValue[] arr, int start, int to) {
+        SMValue lastElement = arr[to];
+        SMValue temp;
 
         for (int i = to; i > start; i--) {
             arr[i] = arr[i - 1];
@@ -48,7 +48,7 @@ public class StableSelectionSort {
 
         return arr;
     }
-    public static int indexLowest(SelectionSortValue[] arr, int i) {
+    public static int indexLowest(SMValue[] arr, int i) {
         int indexSmallest = i;
         ++i;
         while (i < arr.length) {

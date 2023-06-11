@@ -47,7 +47,7 @@ public class SelectionSort {
         }
         return arr;
     }
-    public static SelectionSortValue[] selectionSort(SelectionSortValue[] arr) {
+    public static SMValue[] selectionSort(SMValue[] arr) {
         int tempIndex; // holds the value for each indexLowest call;
         for (int i = 0; i < arr.length; i++) {
             tempIndex = indexLowest(arr, i);
@@ -58,13 +58,13 @@ public class SelectionSort {
         }
         return arr;
     }
-    public static SelectionSortValue[] swapElements(SelectionSortValue[] arr, int i, int j) {
-        SelectionSortValue temp = arr[i];
+    public static SMValue[] swapElements(SMValue[] arr, int i, int j) {
+        SMValue temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
         return arr;
     }
-    public static int indexLowest(SelectionSortValue[] arr, int i) {
+    public static int indexLowest(SMValue[] arr, int i) {
         int indexSmallest = i;
         ++i;
         while (i < arr.length) {
