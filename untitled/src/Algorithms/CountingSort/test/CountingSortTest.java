@@ -45,4 +45,18 @@ public class CountingSortTest {
 
         Assert.assertArrayEquals(expected, actual);
     }
+
+    @Test
+    public void CountingSortNoShifts() {
+        final int[] unordered = new int[]{1, 4, 1, 2, 7, 5, 2};
+        final int[] ordered = new int[]{1, 1, 2, 2, 4, 5, 7};
+
+        final var expected = SMValueFactory.getValueFromIntArray(ordered);
+        SMValue[] actual = SMValueFactory.getValueFromIntArray(unordered);
+
+        CountingSort.sortNoShift(actual, 0, 9);
+
+        Assert.assertArrayEquals(expected, actual);
+    }
+
 }

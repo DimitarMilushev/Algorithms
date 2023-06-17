@@ -2,10 +2,7 @@ package Exercises;
 
 import Algorithms.CountingSort.src.CountingSort;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Given two integer arrays nums1 and nums2, return an array of their
@@ -21,7 +18,7 @@ public class IntersectionOfTwoArrays {
     public static void main(String[] args) {
         final int[] arr1 = new int[] {1,2,2,1};
         final int[] arr2 = new int[] {2, 2};
-        System.out.println(Arrays.toString(SetSolution(arr1, arr2)));
+        System.out.println(Arrays.toString(FastSolution(arr1, arr2)));
     }
 
     /**
@@ -78,28 +75,63 @@ public class IntersectionOfTwoArrays {
         }
         return set.stream().mapToInt(Integer::intValue).toArray();
     }
+
+    /**
+     * This solution uses the least amount of space time.
+     * 1. Stores all nums1 array values as indices, similar to a counting sort, inside
+     * of a checkArray. The values of each index is a boolean:
+     *      1.1. This indicates if index has been used (prevents duplication)
+     *      1.2. Since boolean is only 2 bytes, this is the least memory heavy structure.
+     * 2. Then creates a size variable, similar ot all Collections implementing structures.
+     * 3. The output array is AT MOST the smaller of the two arrays.
+     * 4. Checks for each element in nums2.
+     *      4.1. If it exists, then mark as present, increment size and add to the output array.
+     * 5. Copies elements from 0 to size of the output array.
+     *
+     * Time Complexity: O(n)
+     * Space Complexity: O(n)
+     */
+    private static int[] FastSolution(int[] nums1, int[] nums2) {
+        boolean[] checkArray = new boolean[NUMBERS_RANGE + 1];
+        // O(n)
+        for (int v : nums1) {
+            checkArray[v] = true;
+        }
+        int size = 0;
+        // O(n)
+        int[] res = new int[Math.min(nums1.length, nums2.length)];
+        // O(n)
+        for (int v : nums2) {
+            // O(1) ~
+            if (checkArray[v]) { // Checks for duplicate
+                res[size] = v;
+                size++;
+                checkArray[v] = false;
+            }
+        }
+        // O(n)
+        return Arrays.copyOf(res, size);
+    }
     private static int[] SetSolution(int[] nums1, int[] nums2) {
         if (nums1.length == 0 || nums2.length == 0) return new int[]{};
 
-        Set<Integer> set = new HashSet<>();
-        int[] smaller = nums1.length > nums2.length ? nums2 : nums1;
-        int[] bigger = nums1.length <= nums2.length ? nums2 : nums1;
-
-        for (int e : smaller) {
-            set.add(e);
+        Set<Integer> smallerSetNumbers = new HashSet<>();
+        ArrayList<Integer> intersections = new ArrayList<>(Math.min(nums1.length, nums2.length));
+        // O(n)
+        for (int e : nums1) {
+            // O(1)
+            smallerSetNumbers.add(e);
         }
-        Set<Integer> output = new HashSet<>();
-        for (int e : bigger){
-            if (output.size() >= smaller.length) break;
-            if (set.contains(e)) {
-                output.add(e);
+        // O(n)
+        for (int e : nums2){
+            if (smallerSetNumbers.contains(e)) {
+                intersections.add(e);
+                smallerSetNumbers.remove(e);
             }
         }
-
-        return output.stream().mapToInt(Integer::intValue).toArray();
+        // O(n)
+        return intersections.stream().mapToInt(Integer::intValue).toArray();
     }
-
-
 
     private static int NUMBERS_RANGE = 1000; // Constraint 0 - 1000
     private static void CountingSort(int[] list, int range) {

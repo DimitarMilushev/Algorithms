@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static Algorithms.SelectionSort.src.SelectionSort.recursive;
 import static Algorithms.SelectionSort.src.SelectionSort.selectionSort;
 
 public class SelectionSortTest {
@@ -73,5 +74,17 @@ public class SelectionSortTest {
         Assert.assertEquals(first.tag(), "b");
         Assert.assertEquals(second.tag(), "a");
     }
+    @Test
+    public void sortsIntegerElementsRecursively() {
+        list = new int[] {4, 1, 2, 4, 3};
+        SMValue[] values = recursive(SMValueFactory.getValueFromIntArray(list), null);
+        int[] result = new int[values.length];
+        Object[] objArray = Arrays.stream(values).map(SMValue::Value).toArray();
+        for (int i = 0; i < values.length; i++) {
+            result[i] = (int) objArray[i];
+        }
 
+        int[] expected = new int[] {1, 2, 3, 4, 4};
+        Assert.assertArrayEquals(result, expected );
+    }
 }
